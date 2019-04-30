@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration scan="true">
+  <!-- use Spring default values -->
+  <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
+
+  <property resource="application.properties" />
+  <property name="LOG_PATH" value="log" />
+  <contextName>${spring.application.name}</contextName>
+
+  <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+    <encoder>
+      <pattern>
+        %clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){faint} %clr(${LOG_LEVEL_PATTERN:-%5p}) %clr(${PID:- }){magenta} %clr(---){faint} %clr([%15.15t]){faint} %clr(%-40.40logger{39}){cyan} %clr(:){faint} %m%n${LOG_EXCEPTION_CONVERSION_WORD:-%wEx}
+      </pattern>
+      <charset>utf8</charset>
+    </encoder>
+  </appender>
+
+  <appender name="ACCESS-CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+    <encoder class="net.logstash.logback.encoder.LogstashAccessEncoder">
+    <fieldNames>
+      <requestHeaders>request_headers</requestHeaders>
+      <responseHeaders>response_headers</responseHeaders>
+    </fieldNames>
+    <lowerCaseHeaderNames>true</lowerCaseHeaderNames>
+  </encoder>
+  </appender>
+
+  <appender name="LOG-CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+    <encoder class="net.logstash.logback.encoder.LogstashEncoder">
+      <fieldNames class="net.logstash.logback.fieldnames.ShortenedFieldNames"/>
+      <timeZone>UTC</timeZone>
+      <includeContext>false</includeContext>
+      <includeCallerData>true</includeCallerData>
+      <includeMdcKeyName>correlationId</includeMdcKeyName>
+      <includeMdcKeyName>userId</includeMdcKeyName>
+      <includeMdcKeyName>sourceIPAddress</includeMdcKeyName>
+      <includeMdcKeyName>destinationIPAddress</includeMdcKeyName>
+      <includeMdcKeyName>protocol</includeMdcKeyName>
+      <includeMdcKeyName>terminalAddress</includeMdcKeyName>
+      <includeMdcKeyName>activityType</includeMdcKeyName>
+      <includeMdcKeyName>activity</includeMdcKeyName>
+      <customFields>
+        {"app":"${spring.application.name}",
+        "organization":"DF - Ingestion"}
+      </customFields>
+      <fieldNames>
+        <timestamp>ts</timestamp>
+        <message>message</message>
+        <thread>thread</thread>
+        <!--logger>logger</logger-->
+        <version>ver</version>
+        <levelValue>[ignore]</levelValue>
+        <caller>trace</caller>
+        <stackTrace>exception</stackTrace>
+      </fieldNames>
+    </encoder>
+
+    <!--encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
+      <providers>
+        <contextName>
+          <fieldName>app</fieldName>
+        </contextName>
+        <mdc>
+          <includeMdcKeyName>correlationId</includeMdcKeyName>
+          <includeMdcKeyName>userId</includeMdcKeyName>
+          <includeMdcKeyName>sourceIPAddress</includeMdcKeyName>
+          <includeMdcKeyName>destinationIPAddress</includeMdcKeyName>
+          <includeMdcKeyName>protocol</includeMdcKeyName>
+          <includeMdcKeyName>terminalAddress</includeMdcKeyName>
+          <includeMdcKeyName>activityType</includeMdcKeyName>
+          <includeMdcKeyName>activity</includeMdcKeyName>
+        </mdc>
+        <timestamp>
+          <fieldName>ts</fieldName>
+          <timeZone>UTC</timeZone>
+          <pattern>yyyy-MM-dd'T'HH:mm:ss.SSSZZ</pattern>
+        </timestamp>
+        <loggerName>
+          <fieldName>logger</fieldName>
+        </loggerName>
+        <logLevel>
+          <fieldName>level</fieldName>
+        </logLevel>
+        <callerData>
+          <classFieldName>class</classFieldName>
+          <methodFieldName>method</methodFieldName>
+          <lineFieldName>line</lineFieldName>
+          <fileFieldName>file</fileFieldName>
+        </callerData>
+        <threadName>
+          <fieldName>thread</fieldName>
+        </threadName>
+        <arguments>
+          <includeNonStructuredArguments>false</includeNonStructuredArguments>
+        </arguments>
+        <stackTrace>
+          <fieldName>stack</fieldName>
+        </stackTrace>
+        <message>
+          <fieldName>msg</fieldName>
+        </message>
+      </providers>
+    </encoder-->
+
+  </appender>
+
+  <!--appender name="SIEM-LOG" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <File>log/siem-log.json</File>
+    <encoder
+      class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">
+      <layout class="ch.qos.logback.classic.PatternLayout">
+      <pattern>
+        {"UserID": "%X{userId}",
+        "CorrelationId": "%X{correlationId}",
+        "Source IP Address": "%X{sourceIPAddress}",
+        "Destination IP Address": "%X{destinationIPAddress}",
+        "Protocol": "%X{protocol}",
+        "Terminal Address": "%thread",
+        "Activity type": "%X{activityType}",
+        "Activity": "%X{activity}",
+        "Data and Timestamp": "%d{yyyy-MM-dd HH:mm:ss}",
+        "Message": "%msg"
+        }%n
+      </pattern>
+      </layout>
+    </encoder>
+    <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+      <fileNamePattern>${LOGS_HOME}/siem-log.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+      <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+        <maxFileSize>100MB</maxFileSize>
+      </timeBasedFileNamingAndTriggeringPolicy>
+    </rollingPolicy>
+  </appender>
+
+  <logger name="siem-log" level="info" additivity="false">
+    <appender-ref ref="SIEM-LOG"/>
+  </logger-->
+
+  <root level="info">
+    <!--appender-ref ref="ACCESS-CONSOLE" /-->
+    <appender-ref ref="LOG-CONSOLE" />
+  </root>
+</configuration>
