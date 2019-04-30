@@ -17,7 +17,6 @@ public class LogInterceptor extends HandlerInterceptorAdapter {
       throws Exception {
 
     logger.info("-------- LogInterception.preHandle --- ");
-    logger.info("Request URL: " + request.getRequestURL());
 
     // LoggingContext loggingContext = buildSIEMLoggingConextFromHttpServletRequest(request);
     // installContext(loggingContext);
@@ -27,6 +26,8 @@ public class LogInterceptor extends HandlerInterceptorAdapter {
     MDC.putCloseable("destinationIPAddress", request.getLocalAddr());
     MDC.putCloseable("protocol", request.getProtocol());
     MDC.putCloseable("terminalAddress", request.getLocalAddr());
+
+    logger.info("Request URL: " + request.getRequestURL());
 
     return true;
   }
